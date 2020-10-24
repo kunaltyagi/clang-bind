@@ -371,7 +371,6 @@ def test_class_template(tmp_path):
     assert template_type_parameter["access_specifier"] == "PUBLIC"
 
 
-
 def test_template_non_type_parameter(tmp_path):
     file_contents = """
     template <int N>
@@ -452,6 +451,9 @@ def test_template_instantiate_single_parameter(tmp_path):
     struct AStruct<int>;
     template
     class AClass<char>;
+    
+    template <typename T>
+    void aFunction(T) {}
 
     template
     void aFunction<bool>(bool) {}
@@ -464,7 +466,7 @@ def test_template_instantiate_single_parameter(tmp_path):
         {sub_item["name"]: sub_item["members"] for sub_item in parsed_info["members"]},
     )
     # Doesn't detect 3 items in next line
-    # assert len(parsed_info["members"]) == 3
+    assert len(parsed_info["members"]) == 4
 
     struct_inst = parsed_info["members"][0]
     class_inst = parsed_info["members"][1]
