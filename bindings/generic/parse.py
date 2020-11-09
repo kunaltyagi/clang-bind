@@ -2,8 +2,7 @@ import os
 import sys
 import clang.cindex as clang
 
-from context import scripts
-import scripts.utils as utils
+from generic import utils
 
 
 def valid_children(node):

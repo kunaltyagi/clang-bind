@@ -1,5 +1,4 @@
-from context import scripts
-import scripts.parse as parse
+from generic import parse
 
 
 def create_compilation_database(tmp_path, filepath):
