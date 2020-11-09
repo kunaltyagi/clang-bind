@@ -92,10 +92,10 @@ class CategorizedArgs:
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         )
         parser.add_argument(
-            "--compile-commands",
+            "--build-dir",
             default=guess_build_dir(),
             required=guess_build_dir() is None,
-            help="Path to compile_commands.json file or the directory containing it",
+            help="Path to the build directory",
         )
         parser.add_argument(
             "--project-root",
@@ -123,16 +123,29 @@ class CategorizedArgs:
             help="Ignore certain files from the compile database",
         )
         parser.add_argument(
-            "--language",
-            default="py",
-            choices=["py"],
-            help="Target language for the bindings",
+            "--cmake-frontend",
+            default="compile_commands",
+            choices=["compile_commands", "cmake_file_api"],
+            help="Input method of files to target for the bindings",
         )
         parser.add_argument(
             "--use-latest-conan-cmake",
             default=False,
             action="store_true",
             help="Use the latest release of conan-cmake instead of the bundled release (0.15.0)",
+        )
+        lang = parser.add_mutually_exclusive_group()
+        lang.add_argument(
+            "--language",
+            default="py",
+            choices=["py"],
+            help="Target language for the bindings. Default backend will be chosen",
+        )
+        lang.add_argument(
+            "--backend",
+            default="pybind11",
+            choices=["pybind11"],
+            help="Target backend for generating the bindings",
         )
 
         for category in self._internal_categories:
@@ -146,11 +159,11 @@ class CategorizedArgs:
     def _get_args(self, category=None):
         if category is None:
             args = get_args(self._parser)
-            root, last_item = args.compile_commands.rsplit(os.path.sep, 1)
+            root, last_item = args.build_dir.rsplit(os.path.sep, 1)
             if (last_item == "compile_commands.json") and os.path.isfile(
-                args.compile_commands
+                args.build_dir
             ):
-                args.compile_commands = root
+                args.build_dir = root
             return args
         elif category in self._internal_categories:
             return get_args(self._parse_group[category])
