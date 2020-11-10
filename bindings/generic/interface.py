@@ -4,7 +4,7 @@ import argparse
 from functools import lru_cache
 import os
 
-from mako.template import Template
+from mako.template import Template  # type: ignore
 
 
 def get_args(parser):

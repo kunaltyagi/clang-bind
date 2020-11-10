@@ -1,6 +1,6 @@
 import os
 import sys
-import clang.cindex as clang
+import clang.cindex as clang  # type: ignore
 
 from generic import utils
 
