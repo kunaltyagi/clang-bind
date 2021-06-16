@@ -74,6 +74,7 @@ class ClangUtils:
             "get_address_space",
             "get_typedef_name",
             "tls_kind",
+            "objc_type_encoding"
         ]
 
         # populate dicts
