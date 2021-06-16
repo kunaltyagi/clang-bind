@@ -364,24 +364,24 @@ def test_class_template(tmp_path):
 
     struct_template = parsed_info["members"][0]
 
-    assert struct_template["kind"] == "CLASS_TEMPLATE"
-    assert struct_template["name"] == "AStruct"
+    assert struct_template["cursor_kind"]["name"] == "CLASS_TEMPLATE"
+    assert struct_template["cursor"]["spelling"] == "AStruct"
 
     template_type_parameter = struct_template["members"][0]
 
-    assert template_type_parameter["kind"] == "TEMPLATE_TYPE_PARAMETER"
-    assert template_type_parameter["name"] == "T"
-    assert template_type_parameter["access_specifier"] == "PUBLIC"
+    assert template_type_parameter["cursor_kind"]["name"] == "TEMPLATE_TYPE_PARAMETER"
+    assert template_type_parameter["cursor"]["spelling"] == "T"
+    assert template_type_parameter["cursor"]["access_specifier"] == "PUBLIC"
 
     class_template = parsed_info["members"][1]
 
     assert class_template["cursor_kind"]["name"] == "CLASS_TEMPLATE"
-    assert class_template["cursor"]["spelling"] == "AStruct"
+    assert class_template["cursor"]["spelling"] == "AClass"
 
     template_type_parameter = class_template["members"][0]
 
     assert template_type_parameter["cursor_kind"]["name"] == "TEMPLATE_TYPE_PARAMETER"
-    assert template_type_parameter["cursor"]["spelling"] == "T"
+    assert template_type_parameter["cursor"]["spelling"] == "U"
     assert template_type_parameter["cursor"]["access_specifier"] == "PUBLIC"
 
 
@@ -450,9 +450,9 @@ def test_template_type_single_parameter(tmp_path):
     class_template = parsed_info["members"][1]
     template_type_parameter = class_template["members"][0]
 
-    assert template_type_parameter["kind"] == "TEMPLATE_TYPE_PARAMETER"
-    assert template_type_parameter["element_type"] == "Unexposed"
-    assert template_type_parameter["name"] == "U"
+    assert template_type_parameter["cursor_kind"]["name"] == "TEMPLATE_TYPE_PARAMETER"
+    assert template_type_parameter["type"]["kind"] == "UNEXPOSED"
+    assert template_type_parameter["cursor"]["spelling"] == "U"
 
     function_template = parsed_info["members"][2]
     template_type_parameter = function_template["members"][0]
@@ -467,8 +467,8 @@ def test_template_instantiate_single_parameter(tmp_path):
     template <typename T>
     struct AStruct { T value; };
     template <typename T>
-    class AClass { const T privateValue; }
-    template <class T>
+    class AClass { const T privateValue; };
+    template <typename T>
     T aFunction(T&& aValue) { return aValue; }
 
     template
@@ -479,29 +479,23 @@ def test_template_instantiate_single_parameter(tmp_path):
     bool aFunction(bool&&);
     """
     parsed_info = get_parsed_info(tmp_path=tmp_path, file_contents=file_contents)
-    print(parsed_info["members"])
-    # As per generate.py:219, there should be some member with "kind" `TYPE_REF`
-    print(
-        "Member details:",
-        [{sub_item["name"]: sub_item["kind"]} for sub_item in parsed_info["members"]],
-    )
-    # Doesn't detect 3 items in next line
-    assert len(parsed_info["members"]) == 6
 
-    struct_inst = parsed_info["members"][0]
+    parsed_info = parsed_info["members"][0]
 
-    assert struct_inst["kind"] == "STRUCT_DECL"
-    assert struct_inst["kind_is_declaration"] == True
+    struct_inst = parsed_info["members"][3]
 
-    class_inst = parsed_info["members"][1]
+    assert struct_inst["cursor_kind"]["name"] == "STRUCT_DECL"
+    assert struct_inst["cursor_kind"]["is_declaration"] == True
 
-    assert class_inst["kind"] == "CLASS_DECL"
-    assert class_inst["kind_is_declaration"] == True
+    class_inst = parsed_info["members"][4]
 
-    func_inst = parsed_info["members"][2]
+    assert class_inst["cursor_kind"]["name"] == "CLASS_DECL"
+    assert class_inst["cursor_kind"]["is_declaration"] == True
 
-    assert func_inst["kind"] == "FUNCTION_DECL"
-    assert func_inst["kind_is_declaration"] == True
+    func_inst = parsed_info["members"][5]
+    
+    assert func_inst["cursor_kind"]["name"] == "FUNCTION_DECL"
+    assert func_inst["cursor_kind"]["is_declaration"] == True
 
 
 def test_default_delete_constructor(tmp_path):
